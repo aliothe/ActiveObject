@@ -9,7 +9,7 @@ namespace morpheus{
     template<typename T>
     class ConcurrentQueue{
     public:
-        ConcurrentQueue()
+        explicit ConcurrentQueue()
         {}
         void push(T t)
         {
@@ -30,9 +30,10 @@ namespace morpheus{
             return queue_.empty();
         }
 
-    private:
-        ConcurrentQueue(ConcurrentQueue&);
-        void operator=(ConcurrentQueue&);
+	ConcurrentQueue(ConcurrentQueue&) = delete;
+        void operator=(ConcurrentQueue&) = delete;
+
+    private:        
         std::mutex mutex_;
         std::deque<T> queue_;        
     };

@@ -10,9 +10,12 @@ namespace morpheus{
     public:
         using Message = std::function<void()>;
 
-        ActiveObject();
+        explicit ActiveObject();
         ~ActiveObject();
         void Send(Message m);
+
+	ActiveObject(ActiveObject&) = delete;
+	void operator=(ActiveObject&) = delete;
 
     private:
         void Run();
