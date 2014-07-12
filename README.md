@@ -5,6 +5,7 @@ ActiveObject implementation a'la Herb Sutter
 
 Prerequisite
 ============
+* only tested on linux
 * g++ wich groks c++11 - [g++]
 * java - [java]
 
