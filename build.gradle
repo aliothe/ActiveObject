@@ -23,7 +23,7 @@ executables{
         }
     }
     test2{
-        baseName 'test'
+        baseName 'test2'
         binaries.all { binary ->
             targetBuildTypes "debug"
             lib libraries.activeobject.static
