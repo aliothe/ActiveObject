@@ -5,7 +5,7 @@ ActiveObject implementation a'la Herb Sutter
 
 Prerequisite
 ============
-* g++ wich groks c++11
+* g++ wich groks c++11 - [g++]
 * java - [java]
 
 Build and test
@@ -38,6 +38,6 @@ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-[gradle]: http://gcc.gnu.org/
+[g++]: http://gcc.gnu.org/
 [java]: http://www.oracle.com/technetwork/java/javase/overview/index.html
 
