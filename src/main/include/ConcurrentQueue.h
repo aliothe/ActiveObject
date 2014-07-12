@@ -30,8 +30,8 @@ namespace morpheus{
             return queue_.empty();
         }
 
-	ConcurrentQueue(ConcurrentQueue&) = delete;
-        void operator=(ConcurrentQueue&) = delete;
+	ConcurrentQueue(const ConcurrentQueue&) = delete;
+        ConcurrentQueue& operator=(const ConcurrentQueue&) = delete;
 
     private:        
         std::mutex mutex_;

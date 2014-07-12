@@ -14,8 +14,8 @@ namespace morpheus{
         ~ActiveObject();
         void Send(Message m);
 
-	ActiveObject(ActiveObject&) = delete;
-	void operator=(ActiveObject&) = delete;
+	ActiveObject(const ActiveObject&) = delete;
+	ActiveObject& operator=(const ActiveObject&) = delete;
 
     private:
         void Run();
