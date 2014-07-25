@@ -12,7 +12,7 @@ ActiveObject::~ActiveObject()
     thread_->join();
 }
 
-void ActiveObject::Send(Message m)
+void ActiveObject::Send(const Message& m)
 {
     queue_.push(m);
     std::unique_lock<std::mutex> lock(mutex_);

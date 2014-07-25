@@ -11,7 +11,7 @@ namespace morpheus{
     public:
         explicit ConcurrentQueue()
         {}
-        void push(T t)
+        void push(const T& t)
         {
             std::lock_guard<std::mutex> lock(mutex_);
             queue_.push_front(t);

@@ -12,7 +12,7 @@ namespace morpheus{
 
         explicit ActiveObject();
         ~ActiveObject();
-        void Send(Message m);
+        void Send(const Message& m);
 
 	ActiveObject(const ActiveObject&) = delete;
 	ActiveObject& operator=(const ActiveObject&) = delete;
