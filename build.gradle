@@ -4,6 +4,13 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.0'
 }
 
+model {
+    toolChains {
+    	gcc(Gcc){
+	}		
+    }
+}
+
 libraries{
     activeobject{
         binaries.all{
