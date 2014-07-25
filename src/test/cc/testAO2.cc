@@ -12,6 +12,8 @@ public:
 	     [cb](){
 	       // Do job here ( such as write data, whatever)
 	       // signal to caller
+	       // be sure to trap any exceptions!
+	       // (propagate them via the cb)
 	       cb(true);
 	     });
   }

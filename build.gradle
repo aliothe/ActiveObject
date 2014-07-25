@@ -38,6 +38,15 @@ executables{
             linker.args '-pthread'
         }
     }
+    testException{
+        baseName 'testException'
+        binaries.all { binary ->
+            targetBuildTypes "debug"
+            lib libraries.activeobject.static
+            cppCompiler.args '-Wall', '-Werror', '-std=c++11', '-I', '$projectDir/src/main/include'
+            linker.args '-pthread'
+        }
+    }
 }
 
 sources {
@@ -65,6 +74,14 @@ sources {
             source{
                 srcDirs 'src/test/cc'
                 include "**/testAO2.cc"
+            }
+        }
+    }
+    testException{
+        cpp{
+            source{
+                srcDirs 'src/test/cc'
+                include "**/testAOException.cc"
             }
         }
     }
