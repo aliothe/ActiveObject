@@ -41,7 +41,7 @@ int main()
 
 Prerequisite
 ============
-* only tested on linux
+* tested on linux, windows via cygwin
 * g++ wich groks c++11 - [g++]
 * java - [java]
 
