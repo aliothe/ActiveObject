@@ -14,7 +14,8 @@ model {
 libraries{
     activeobject{
         binaries.all{
-            cppCompiler.args '-Wall', '-Werror', '-std=c++11'
+            targetBuildTypes 'debug'
+            cppCompiler.args '-Wall', '-Werror', '-g', '-std=c++11'
         }
     }
 }
@@ -23,7 +24,7 @@ executables{
     test{
         baseName 'test'
         binaries.all { binary ->
-            targetBuildTypes "debug"
+            targetBuildTypes 'debug'
             lib libraries.activeobject.static
             cppCompiler.args '-Wall', '-Werror', '-std=c++11', '-I', '$projectDir/src/main/include'
             linker.args '-pthread'
@@ -32,7 +33,7 @@ executables{
     test2{
         baseName 'test2'
         binaries.all { binary ->
-            targetBuildTypes "debug"
+            targetBuildTypes 'debug'
             lib libraries.activeobject.static
             cppCompiler.args '-Wall', '-Werror', '-std=c++11', '-I', '$projectDir/src/main/include'
             linker.args '-pthread'
@@ -41,7 +42,16 @@ executables{
     testException{
         baseName 'testException'
         binaries.all { binary ->
-            targetBuildTypes "debug"
+            targetBuildTypes 'debug'
+            lib libraries.activeobject.static
+            cppCompiler.args '-Wall', '-Werror', '-std=c++11', '-I', '$projectDir/src/main/include'
+            linker.args '-pthread'
+        }
+    }
+    testAsyncIO{
+        baseName 'testAsyncIO'
+        binaries.all { binary ->
+            targetBuildTypes 'debug'
             lib libraries.activeobject.static
             cppCompiler.args '-Wall', '-Werror', '-std=c++11', '-I', '$projectDir/src/main/include'
             linker.args '-pthread'
@@ -85,6 +95,14 @@ sources {
             }
         }
     }
+    testAsyncIO{
+        cpp{
+            source{
+                srcDirs 'src/test/cc'
+                include "**/testAsyncIO.cc"
+            }
+        }
+    }
 }
 
 task test {
@@ -99,12 +117,12 @@ task test {
             def tempDir = new File(temporaryDir, test.executableFile.name)
             tempDir.mkdirs()
             exec {
-              logger.quiet ""
-              logger.quiet ">>> Testing `${relativePath test.executableFile}`"
-              logger.quiet ">>> in dir `${tempDir}`"
-              logger.quiet ""
-              workingDir tempDir
-              commandLine test.executableFile
+                logger.quiet ""
+                logger.quiet ">>> Testing `${relativePath test.executableFile}`"
+                logger.quiet ">>> in dir `${tempDir}`"
+                logger.quiet ""
+                workingDir tempDir
+                commandLine test.executableFile
             }
         }
     }

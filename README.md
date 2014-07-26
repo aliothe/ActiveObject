@@ -39,11 +39,46 @@ int main()
 }
 ```
 
+Or for async file io ( see testAsyncIO.cc)
+
+```
+    std::string testfilename = "testfile";
+    std::string content = "Lorem ipsum dolor sit amet, wisi voluptua contentiones usu et, omittam torquatos dissentiunt no vis. Ei magna clita ornatus duo, oblique dolorum eos et. Pri id prodesset temporibus, mei eu velit graece invenire, veri affert complectitur has te. Ea mea legimus consequuntur, at atomorum senserit sed. Invidunt periculis ius te, at pro alienum quaestio, vim ut verear corrumpit percipitur. Ad pro laboramus intellegat, te cum cibo eloquentiam.\n";
+
+    File::Write(testfilename, content, 
+                [testfilename](File::ErrorMsg err)
+                {
+                    if(!err.empty())
+                    {
+                        printf("Error: %s\n", err.c_str());
+                        return;
+                    }
+                    for(auto i = 0; i < 5; ++i)
+                    {
+                        File::Read(testfilename, 
+                                   [](File::ErrorMsg err, File::RawData data)
+                                   {
+                                       if(!err.empty())
+                                       {
+                                           printf("Error: %s\n", err.c_str());
+                                           return;
+                                       }
+                                       printf("read: %lu bytes\n", data.second);
+                                       for(size_t i = 0; i < data.second; ++i)
+                                       {
+                                           printf("%c", data.first[i]);
+                                       }
+                                   });
+                    }
+                });
+
+```
+
 Prerequisite
 ============
 * tested on linux, windows via cygwin
 * g++ wich groks c++11 - [g++]
-* java - [java]
+* java ( used for building via gradle) - [java]
 
 Build and test
 ==============
