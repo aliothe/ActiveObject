@@ -76,7 +76,7 @@ Or for async file io ( see testAsyncIO.cc)
 
 Prerequisite
 ============
-* tested on linux, windows via cygwin
+* tested on linux 
 * g++ wich groks c++11 - [g++]
 * java ( used for building via gradle) - [java]
 
