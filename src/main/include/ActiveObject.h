@@ -13,6 +13,7 @@ namespace morpheus{
         using Message = std::function<void()>;
 	using ErrorCB = std::function<void(std::exception_ptr)>;
 	using QueueData = std::pair<Message, ErrorCB>;
+        using MutexType = std::recursive_mutex;
 
         explicit ActiveObject();
         ~ActiveObject();
@@ -30,8 +31,9 @@ namespace morpheus{
 	class WrapperMessage;
         morpheus::ConcurrentQueue<QueueData> queue_;
         std::unique_ptr<std::thread> thread_;
-        std::mutex mutex_;
-        std::condition_variable cv_;
+        // used for condition variable
+        MutexType mutex_;
+        std::condition_variable_any cv_;
     };
 
 }

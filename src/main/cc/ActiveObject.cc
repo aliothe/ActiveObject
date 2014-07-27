@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "ActiveObject.h"
 
 namespace morpheus{ 
@@ -17,15 +18,15 @@ ActiveObject::~ActiveObject()
 
 void ActiveObject::Send(const Message& m)
 {
+    std::lock_guard<MutexType> lock(mutex_);
     queue_.push(std::make_pair(m, ActiveObject::ErrorCB()));
-    std::unique_lock<std::mutex> lock(mutex_);
     cv_.notify_one();
 }
 
 void ActiveObject::Send(const Message& m, const ErrorCB& on_error)
 {
+    std::lock_guard<MutexType> lock(mutex_);
     queue_.push(std::make_pair(m, on_error));
-    std::unique_lock<std::mutex> lock(mutex_);
     cv_.notify_one();
 }
 
@@ -33,7 +34,7 @@ void ActiveObject::Run()
 {
     while(!done_)
     {
-        std::unique_lock<std::mutex> lock(mutex_);
+        std::unique_lock<MutexType> lock(mutex_);
         // due to possible spurious wakeups not due to being notified
         while(queue_.empty())
         {
@@ -42,28 +43,28 @@ void ActiveObject::Run()
 	ActiveObject::QueueData m = queue_.pop();
 	if(m.second)
 	{
-	  with_error_handler(m);
+            with_error_handler(m);
 	}
 	else
 	{
-	  // any exceptions better be handled in m
-	  // maybe allow the installation of a generic error handler in the AO
-	  // which is then always used in this case
-	  m.first();
+            // any exceptions better be handled in m
+            // maybe allow the installation of a generic error handler in the AO
+            // which is then always used in this case
+            m.first();
 	}
     }
 }         
           
 void with_error_handler(const ActiveObject::QueueData& m)
 {  
-   try
-   {
-     m.first();
-   }
-   catch(...)
-   {
-     m.second(std::current_exception());
-   }  
+    try
+    {
+        m.first();
+    }
+    catch(...)
+    {
+        m.second(std::current_exception());
+    }  
 }
 
 

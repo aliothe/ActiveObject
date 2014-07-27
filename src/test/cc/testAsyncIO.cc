@@ -80,7 +80,8 @@ public:
     static void Read(std::string filename, std::function<void(ErrorMsg, RawData)> cb)
     {
         ThreadPool::instance().nextAO().Send(
-            [filename,cb](){
+            [filename,cb]()
+            {
                 std::ifstream file(filename, std::ios::binary);
                 if(!file)
                 {
@@ -113,26 +114,33 @@ public:
 
     static void Write(std::string filename, std::string data, std::function<void(ErrorMsg)> cb)
     {
-        std::ofstream file(filename, std::ios::binary);
-        if(!file)
-        {
-            std::stringstream what;
-            what << "couldn't open file " << getcwd() << "/" << filename << " for writing\n";
-            cb(what.str());
-            return;
-        }
-        file.write(data.data(), data.length());
-        if(!file)
-        {
-            std::stringstream what;
-            what << "failed to write to file " << getcwd() << "/" << filename << "\n";
-            cb(what.str());
-            return;
-        }          
-        file.close();
-        cb("");
-    }
-
+        ThreadPool::instance().nextAO().Send(
+            [filename,data,cb]()
+            {
+                std::ofstream file(filename, std::ios::binary);
+                if(!file)
+                {
+                    std::stringstream what;
+                    what << "couldn't open file " << getcwd() << "/" << filename << " for writing\n";
+                    cb(what.str());
+                    return;
+                }
+                file.write(data.data(), data.length());
+                if(!file)
+                {
+                    std::stringstream what;
+                    what << "failed to write to file " << getcwd() << "/" << filename << "\n";
+                    cb(what.str());
+                    return;
+                }          
+                file.close();
+                cb("");
+            },
+            [cb](std::exception_ptr e)
+            {
+                cb("");
+            });
+    }            
 };
 
 std::string get_exception_msg(std::exception_ptr e)
@@ -181,15 +189,23 @@ int main()
     std::condition_variable cv;
     bool done = false;
 
+    auto notify = [&mutex, &cv, &done]()
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        done = true;
+        cv.notify_one();
+    };
+
     File::Write(testfilename, content, 
-                [testfilename, &mutex, &cv, &done](File::ErrorMsg err)
+                [testfilename, notify](File::ErrorMsg err)
                 {
                     if(!err.empty())
                     {
                         printf("Error: %s\n", err.c_str());
+                        notify();
                         return;
                     }
-                    for(auto i = 0; i < 5; ++i)
+                    for(auto i = 0; i < 10; ++i)
                     {
                         File::Read(testfilename, 
                                    [](File::ErrorMsg err, File::RawData data)
@@ -199,24 +215,25 @@ int main()
                                            printf("Error: %s\n", err.c_str());
                                            return;
                                        }
-                                       printf("read: %lu bytes\n", data.second);
+                                       printf("<read: %lu bytes>\n", data.second);
                                        for(size_t i = 0; i < data.second; ++i)
                                        {
                                            printf("%c", data.first[i]);
                                        }
                                    });
                     }
-                    std::unique_lock<std::mutex> lock(mutex);
-                    done = true;
-                    cv.notify_one();
+                    notify();
                 });
     // wait that read has been dispatched ( since that happens in the cb above)
     std::unique_lock<std::mutex> lock(mutex);
     while(!done)
     {
+        printf("<waiting for signal>\n");
         cv.wait(lock);
     }
+    printf("<joining>\n");
     // wait for all dispatched work to run to completion before exiting the process
     ThreadPool::join();
+    printf("<done>\n");
     return EXIT_SUCCESS;
 }
