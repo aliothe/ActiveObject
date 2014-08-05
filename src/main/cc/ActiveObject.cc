@@ -35,11 +35,8 @@ void ActiveObject::Run()
     while(!done_)
     {
         std::unique_lock<MutexType> lock(mutex_);
-        // due to possible spurious wakeups not due to being notified
-        while(queue_.empty())
-        {
-            cv_.wait(lock);
-        }
+        // queue size check due to possible spurious wakeups ( not from being notified)
+        cv_.wait(lock, [this](){return !queue_.empty();});
 	ActiveObject::QueueData m = queue_.pop();
 	if(m.second)
 	{
