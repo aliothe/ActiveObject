@@ -14,14 +14,14 @@ namespace morpheus{
         void push(const T& t)
         {
             std::lock_guard<std::mutex> lock(mutex_);
-            queue_.push_front(t);
+            queue_.emplace_back(t);
         }
 
         T pop()
         {
             std::lock_guard<std::mutex> lock(mutex_);
-            T v = queue_.back();
-            queue_.pop_back();
+            T v = queue_.front();
+            queue_.pop_front();
             return v;
         }
 
