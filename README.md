@@ -78,11 +78,13 @@ Prerequisite
 ============
 * tested on linux 
 * g++ wich groks c++11 - [g++]
-* java ( used for building via gradle) - [java]
+* cmake
 
 Build and test
 ==============
-./gradlew test
+Create out of source build directory.
+For instance if you create a directory named build and cd into it,
+you can then issue cmake .. followed my make.
 
 License
 -------
