@@ -13,13 +13,12 @@ add_executable(TestAO2 "${PROJECT_SOURCE_DIR}/test/testAO2.cc")
 add_executable(TestAOException "${PROJECT_SOURCE_DIR}/test/testAOException.cc")
 add_executable(TestAsyncIO "${PROJECT_SOURCE_DIR}/test/testAsyncIO.cc")
 
-install (TARGETS ActiveObject DESTINATION bin)
-install (FILES ActiveObject.h ConcurrentQueue.h DESTINATION include)
+install (TARGETS ActiveObject DESTINATION lib)
+install (FILES include/ActiveObject.h include/ConcurrentQueue.h DESTINATION include)
 
 target_link_libraries(TestAO ActiveObject ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(TestAO2 ActiveObject ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(TestAOException ActiveObject ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(TestAsyncIO ActiveObject ${CMAKE_THREAD_LIBS_INIT})
-
 
 
