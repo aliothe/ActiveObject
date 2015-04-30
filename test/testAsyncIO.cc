@@ -103,7 +103,8 @@ public:
                     what << "could only read  " << file.gcount() << " bytes from file, " << filename << "\n";
                     cb(what.str(), std::make_pair<File::RawDataType, File::RawDataSize>(nullptr,0));
                     return;
-                }                
+                }
+		file.close();
                 cb("", std::make_pair<File::RawDataType, File::RawDataSize>(std::move(data),bytes));
             },
             [cb](std::exception_ptr e)
@@ -205,7 +206,7 @@ int main()
                         notify();
                         return;
                     }
-                    for(auto i = 0; i < 10; ++i)
+                    for(auto i = 0; i < 10 * 100; ++i)
                     {
                         File::Read(testfilename, 
                                    [](const File::ErrorMsg& err, const File::RawData& data)
