@@ -1,7 +1,7 @@
 #ifndef __MORPHEUS_CONCURRENT_QUEUE__
 #define __MORPHEUS_CONCURRENT_QUEUE__
 
-#include <deque>
+#include <vector>
 #include <mutex>
 
 namespace morpheus{ 
@@ -20,8 +20,8 @@ namespace morpheus{
         T pop()
         {
             std::lock_guard<std::mutex> lock(mutex_);
-            T v = queue_.front();
-            queue_.pop_front();
+            T v = queue_.back();
+            queue_.pop_back();
             return v;
         }
 
@@ -33,9 +33,9 @@ namespace morpheus{
 	ConcurrentQueue(const ConcurrentQueue&) = delete;
         ConcurrentQueue& operator=(const ConcurrentQueue&) = delete;
 
-    private:        
+    private:
         std::mutex mutex_;
-        std::deque<T> queue_;        
+        std::vector<T> queue_;        
     };
 
 }
