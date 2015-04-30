@@ -28,7 +28,6 @@ namespace morpheus{
 
     private:
         bool done_;
-	class WrapperMessage;
         morpheus::ConcurrentQueue<QueueData> queue_;
         std::unique_ptr<std::thread> thread_;
         // used for condition variable
