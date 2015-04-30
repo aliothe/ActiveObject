@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include <functional>
-#include <cstdio>
+#include <iostream>
 #include <string>
 #include <cstring>
 #include <unistd.h>
@@ -197,29 +197,31 @@ int main()
     };
 
     File::Write(testfilename, content, 
-                [testfilename, notify](File::ErrorMsg err)
+                [testfilename, notify](const File::ErrorMsg& err)
                 {
                     if(!err.empty())
                     {
-                        printf("Error: %s\n", err.c_str());
+			std::cout << "Error: " << err.c_str() << "\n";
                         notify();
                         return;
                     }
                     for(auto i = 0; i < 10; ++i)
                     {
                         File::Read(testfilename, 
-                                   [](File::ErrorMsg err, File::RawData data)
+                                   [](const File::ErrorMsg& err, const File::RawData& data)
                                    {
                                        if(!err.empty())
                                        {
-                                           printf("Error: %s\n", err.c_str());
+					   std::cout << "Error: " << err.c_str() << "\n";
                                            return;
                                        }
-                                       printf("<read: %lu bytes>\n", data.second);
+				       std::stringstream msg;
+				       msg << "<read: " <<  data.second << " bytes>\n";
                                        for(size_t i = 0; i < data.second; ++i)
                                        {
-                                           printf("%c", data.first[i]);
+					   msg << data.first[i];
                                        }
+				       std::cout << msg.str() << "\n";
                                    });
                     }
                     notify();
@@ -228,12 +230,14 @@ int main()
     std::unique_lock<std::mutex> lock(mutex);
     while(!done)
     {
-        printf("<waiting for signal>\n");
+        std::cout << "<waiting for signal>\n";
         cv.wait(lock);
     }
-    printf("<joining>\n");
+    std::cout << "<joining>\n";
     // wait for all dispatched work to run to completion before exiting the process
     ThreadPool::join();
-    printf("<done>\n");
+    std::cout << "<done>\n";
     return EXIT_SUCCESS;
 }
+
+
