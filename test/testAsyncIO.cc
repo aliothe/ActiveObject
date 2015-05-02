@@ -222,7 +222,7 @@ int main()
                         notify();
                         return;
                     }
-                    for(auto i = 0; i < 2000 * 1000; ++i)
+                    for(auto i = 0; i < 10 * 100; ++i)
                     {
                         File::Read(testfilename, 
                                    readfile);
