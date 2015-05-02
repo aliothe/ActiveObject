@@ -24,50 +24,53 @@ std::string getcwd();
  *
  */
 class ThreadPool{
-public:        
-    static ThreadPool& instance()
+public:
+    ThreadPool(int defaultPoolsize = 4)
+        : poolIndex_(-1),
+          poolsize_(defaultPoolsize),
+          pool_(poolsize_)
     {
-        std::call_once(once_flag_,
-                       [] 
-                       {
-                           instance_.reset(new ThreadPool);
-                       });
-        return *(instance_.get());
+      Start();
     }
-
-    static void join()
-    {
-        delete instance_.release();
-    }
-
+  
     morpheus::ActiveObject& nextAO()
     {
         return pool_[nextAOIndex()];
     }
 
 private:
-    ThreadPool(int defaultPoolsize = 4)
-        : poolIndex_(-1),
-          poolsize_(defaultPoolsize),
-          pool_(poolsize_)
-    {}
-
     int nextAOIndex()
     {
         poolIndex_++;
         poolIndex_ = (poolsize_ == poolIndex_) ? 0 : poolIndex_;
         return poolIndex_;
     }
+
+    void Start()
+    {
+      for(auto& a : pool_)
+      {
+	a.Start();
+      }
+    }
+  
 private:
     int poolIndex_;
     const int poolsize_;
     std::vector<morpheus::ActiveObject> pool_;
-    static std::once_flag once_flag_;
-    static std::unique_ptr<ThreadPool> instance_;
 };
 
-std::unique_ptr<ThreadPool> ThreadPool::instance_;
-std::once_flag ThreadPool::once_flag_;
+std::unique_ptr<ThreadPool> instance_{new ThreadPool()};
+
+ThreadPool& instance()
+{
+  return *(instance_.get());
+}
+
+void join()
+{
+  delete instance_.release();
+}
 
 class File{
 public:
@@ -79,7 +82,7 @@ public:
 
     static void Read(const std::string& filename, std::function<void(ErrorMsg, RawData)> cb)
     {
-        ThreadPool::instance().nextAO().Send(
+        instance().nextAO().Send(
             [filename,cb]()
             {
                 std::ifstream file(filename, std::ios::binary);
@@ -115,7 +118,7 @@ public:
 
     static void Write(const std::string& filename, const std::string& data, std::function<void(ErrorMsg)> cb)
     {
-        ThreadPool::instance().nextAO().Send(
+        instance().nextAO().Send(
             [filename,data,cb]()
             {
                 std::ofstream file(filename, std::ios::binary);
@@ -214,7 +217,7 @@ int main()
                                    };
     
     File::Write(testfilename, content,  
-                [testfilename, readfile, notify](const File::ErrorMsg& err)
+                [testfilename, &readfile, &notify](const File::ErrorMsg& err)
                 {
                     if(!err.empty())
                     {
@@ -231,14 +234,11 @@ int main()
                 });
     // wait that read has been dispatched ( since that happens in the cb above)
     std::unique_lock<std::mutex> lock(mutex);
-    while(!done)
-    {
-        std::cout << "<waiting for signal>\n";
-        cv.wait(lock);
-    }
+    std::cout << "<waiting for signal>\n";
+    cv.wait(lock, [&done](){return done;});
     std::cout << "<joining>\n";
     // wait for all dispatched work to run to completion before exiting the process
-    ThreadPool::join();
+    join();
     std::cout << "<done>\n";
     return EXIT_SUCCESS;
 }

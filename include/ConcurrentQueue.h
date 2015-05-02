@@ -20,16 +20,21 @@ namespace morpheus{
         T pop()
         {
             std::lock_guard<std::mutex> lock(mutex_);
-            T v = queue_.back();
-            queue_.pop_back();
+            T v = queue_.front();
+            queue_.erase(queue_.begin());
             return v;
         }
 
-        bool empty()
+        bool empty() const
         {
             return queue_.empty();
         }
 
+	size_t size() const
+	{
+	  return queue_.size();
+	}
+	
 	ConcurrentQueue(const ConcurrentQueue&) = delete;
         ConcurrentQueue& operator=(const ConcurrentQueue&) = delete;
 

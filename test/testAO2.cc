@@ -6,6 +6,10 @@
 
 class Test{
 public:
+    Test()
+    {
+      a.Start();
+    }
     void Write(const std::string& data, std::function<void(bool)> cb)
     {
         a.Send(

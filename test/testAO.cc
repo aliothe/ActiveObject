@@ -1,10 +1,11 @@
 #include <cstdlib>
-#include <cstdio>
+#include <iostream>
 #include "ActiveObject.h"
 
 int main()
 {
     morpheus::ActiveObject a;
-    a.Send([](){ printf("Hello world\n");});
+    a.Start();
+    a.Send([](){ std::cout << "Hello world\n"; });
     return EXIT_SUCCESS;
 }

@@ -10,6 +10,10 @@ void dump_exception(std::exception_ptr e);
 
 class Test{
 public:
+    Test()
+    {
+      a.Start();
+    }
     void Write(const std::string& data, std::function<void(bool)> cb)
     {
         a.Send(
