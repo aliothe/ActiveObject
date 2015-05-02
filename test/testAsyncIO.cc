@@ -77,7 +77,7 @@ public:
     using RawData = std::pair<RawDataType, RawDataSize>;
     using ErrorMsg = std::string;
 
-    static void Read(std::string filename, std::function<void(ErrorMsg, RawData)> cb)
+    static void Read(const std::string& filename, std::function<void(ErrorMsg, RawData)> cb)
     {
         ThreadPool::instance().nextAO().Send(
             [filename,cb]()
@@ -113,7 +113,7 @@ public:
             });
     }
 
-    static void Write(std::string filename, std::string data, std::function<void(ErrorMsg)> cb)
+    static void Write(const std::string& filename, const std::string& data, std::function<void(ErrorMsg)> cb)
     {
         ThreadPool::instance().nextAO().Send(
             [filename,data,cb]()
@@ -197,19 +197,7 @@ int main()
         cv.notify_one();
     };
 
-    File::Write(testfilename, content, 
-                [testfilename, notify](const File::ErrorMsg& err)
-                {
-                    if(!err.empty())
-                    {
-			std::cout << "Error: " << err.c_str() << "\n";
-                        notify();
-                        return;
-                    }
-                    for(auto i = 0; i < 10 * 100; ++i)
-                    {
-                        File::Read(testfilename, 
-                                   [](const File::ErrorMsg& err, const File::RawData& data)
+    auto readfile = [](const File::ErrorMsg& err, const File::RawData& data)
                                    {
                                        if(!err.empty())
                                        {
@@ -223,7 +211,21 @@ int main()
 					   msg << data.first[i];
                                        }
 				       std::cout << msg.str() << "\n";
-                                   });
+                                   };
+    
+    File::Write(testfilename, content,  
+                [testfilename, readfile, notify](const File::ErrorMsg& err)
+                {
+                    if(!err.empty())
+                    {
+			std::cout << "Error: " << err.c_str() << "\n";
+                        notify();
+                        return;
+                    }
+                    for(auto i = 0; i < 2000 * 1000; ++i)
+                    {
+                        File::Read(testfilename, 
+                                   readfile);
                     }
                     notify();
                 });

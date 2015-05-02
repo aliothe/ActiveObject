@@ -10,7 +10,7 @@ void dump_exception(std::exception_ptr e);
 
 class Test{
 public:
-    void Write(std::string data, std::function<void(bool)> cb)
+    void Write(const std::string& data, std::function<void(bool)> cb)
     {
         a.Send(
             [cb](){
