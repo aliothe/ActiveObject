@@ -17,7 +17,6 @@ namespace morpheus{
 
         explicit ActiveObject();
         ~ActiveObject();
-	void Start();
         void Send(const Message& m);
 	void Send(const Message& m, const ErrorCB& on_error);
 
@@ -26,9 +25,11 @@ namespace morpheus{
 
     private:
         void Run();
-
+	void waitUntilRunning();
+	
     private:
         bool done_;
+	bool running_;
         morpheus::ConcurrentQueue<QueueData> queue_;
         std::thread thread_;
         // used for condition variable

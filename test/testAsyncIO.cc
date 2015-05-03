@@ -29,9 +29,7 @@ public:
         : poolIndex_(-1),
           poolsize_(defaultPoolsize),
           pool_(poolsize_)
-    {
-      Start();
-    }
+    {}
   
     morpheus::ActiveObject& nextAO()
     {
@@ -44,14 +42,6 @@ private:
         poolIndex_++;
         poolIndex_ = (poolsize_ == poolIndex_) ? 0 : poolIndex_;
         return poolIndex_;
-    }
-
-    void Start()
-    {
-      for(auto& a : pool_)
-      {
-	a.Start();
-      }
     }
   
 private:
