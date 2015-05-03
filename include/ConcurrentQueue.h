@@ -1,11 +1,10 @@
 #ifndef __MORPHEUS_CONCURRENT_QUEUE__
 #define __MORPHEUS_CONCURRENT_QUEUE__
 
-#include <vector>
+#include <deque>
 #include <mutex>
 
-namespace morpheus{ 
-    
+namespace morpheus{     
     template<typename T>
     class ConcurrentQueue{
     public:
@@ -21,7 +20,7 @@ namespace morpheus{
         {
             std::lock_guard<std::mutex> lock(mutex_);
             T v = queue_.front();
-            queue_.erase(queue_.begin());
+	    queue_.pop_front();
             return v;
         }
 
@@ -40,7 +39,7 @@ namespace morpheus{
 
     private:
         std::mutex mutex_;
-        std::vector<T> queue_;        
+	std::deque<T> queue_;
     };
 
 }
