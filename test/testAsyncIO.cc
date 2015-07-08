@@ -215,7 +215,7 @@ int main()
                         notify();
                         return;
                     }
-                    for(auto i = 0; i < 10 * 100; ++i)
+                    for(auto i = 0; i < 1 * 1; ++i)
                     {
                         File::Read(testfilename, 
                                    readfile);

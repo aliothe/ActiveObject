@@ -25,16 +25,14 @@ namespace morpheus{
 
     private:
         void Run();
-	void waitUntilRunning();
 	
     private:
         bool done_;
-	bool running_;
-        morpheus::ConcurrentQueue<QueueData> queue_;
-        std::thread thread_;
-        // used for condition variable
+	// used for condition variable
         MutexType mutex_;	
         std::condition_variable cv_;
+        morpheus::ConcurrentQueue<QueueData> queue_;
+        std::thread thread_;
     };
 
 }
