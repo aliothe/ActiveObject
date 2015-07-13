@@ -77,14 +77,15 @@ Or for async file io ( see testAsyncIO.cc)
 Prerequisite
 ============
 * tested on linux 
-* g++ wich groks c++11 - [g++]
-* cmake
+* c++ compiler wich groks c++11 - [g++, clang++ etc]
+* cmake v3.0.2+
 
 Build and test
 ==============
-Create out of source build directory.
-For instance if you create a directory named build and cd into it,
-you can then issue cmake .. followed my make.
+Create an out of source build directory.
+For instance if you create a directory ../build and cd into it,
+you can then issue cmake ../ActiveObject followed by make.
+
 
 License
 -------
