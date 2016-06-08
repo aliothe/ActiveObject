@@ -2,7 +2,11 @@ cmake_minimum_required (VERSION 3.0.2)
 project (LibActiveObject)
 find_package (Threads)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Werror -O2")
+if(CMAKE_SYSTEM_NAME STREQUAL Windows)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
+else()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Werror -Wall -O2")
+endif()
 
 add_library(ActiveObject "${PROJECT_SOURCE_DIR}/src/ActiveObject.cc")
 
