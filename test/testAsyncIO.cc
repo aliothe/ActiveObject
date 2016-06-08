@@ -31,41 +31,40 @@ std::string getcwd();
  */
 class ThreadPool{
 public:
-ThreadPool(int defaultPoolsize = 4)
-  : poolIndex_(-1),
-    poolsize_(defaultPoolsize),
-    pool_(poolsize_)
-{}
+   ThreadPool(int defaultPoolsize = 4)
+     : poolIndex_(-1),
+       poolsize_(defaultPoolsize),
+       pool_(poolsize_)
+   {}
   
-  morpheus::ActiveObject& nextAO()
-  {
-return pool_[nextAOIndex()];
-}
+   morpheus::ActiveObject& nextAO()
+   {
+      return pool_[nextAOIndex()];
+   }
 
 private:
-  int nextAOIndex()
-  {
-poolIndex_++;
-poolIndex_ = (poolsize_ == poolIndex_) ? 0 : poolIndex_;
-return poolIndex_;
-}
-  
+   int nextAOIndex()
+   {
+      poolIndex_++;
+      poolIndex_ = (poolsize_ == poolIndex_) ? 0 : poolIndex_;
+      return poolIndex_;
+   }  
 private:
   int poolIndex_;
-const int poolsize_;
-std::vector<morpheus::ActiveObject> pool_;
+  const int poolsize_;
+  std::vector<morpheus::ActiveObject> pool_;
 };
 
 std::unique_ptr<ThreadPool> instance_{new ThreadPool()};
 
 ThreadPool& instance()
 {
-return *(instance_.get());
+   return *(instance_.get());
 }
 
 void join()
 {
-delete instance_.release();
+   delete instance_.release();
 }
 
 class File{
@@ -78,37 +77,36 @@ using ErrorMsg = std::string;
 
 static void Read(const std::string& filename, std::function<void(ErrorMsg, RawData)> cb)
 {
-instance().nextAO().Send(
-[filename,cb]()
-{
-std::ifstream file(filename, std::ios::binary);
-if(!file)
-  {
-std::stringstream what;
-what << "couldn't open file " << getcwd() << "/" << filename << "\n";
-cb(what.str(), std::make_pair<File::RawDataType, File::RawDataSize>(nullptr,0));
-return;
-}
-std::streampos begin = file.tellg();
-file.seekg(0,std::ios::end);
-std::streampos end = file.tellg();
-RawDataSize bytes = end - begin;
-file.seekg(std::ios::beg);
-RawDataType data = RawDataType(new Byte[bytes]);
-file.read(&data[0], bytes);
-if(!file || file.bad() || 0 == bytes)
-  {
-std::stringstream what;
-what << "could only read  " << file.gcount() << " bytes from file, " << filename << "\n";
-cb(what.str(), std::make_pair<File::RawDataType, File::RawDataSize>(nullptr,0));
-return;
-}
-cb("", std::make_pair<File::RawDataType, File::RawDataSize>(std::move(data), std::move(bytes)));
-},
-									[cb](std::exception_ptr e)
-{
-  cb(get_exception_msg(e), std::make_pair<File::RawDataType, File::RawDataSize>(nullptr,0));
- });
+   instance().nextAO().Send([filename,cb]()
+   {
+      std::ifstream file(filename, std::ios::binary);
+      if(!file)
+      {
+         std::stringstream what;
+         what << "couldn't open file " << getcwd() << "/" << filename << "\n";
+         cb(what.str(), std::make_pair<File::RawDataType, File::RawDataSize>(nullptr,0));
+         return;
+      }
+      std::streampos begin = file.tellg();
+      file.seekg(0,std::ios::end);
+      std::streampos end = file.tellg();
+      RawDataSize bytes = end - begin;
+      file.seekg(std::ios::beg);
+      RawDataType data = RawDataType(new Byte[bytes]);
+      file.read(&data[0], bytes);
+      if(!file || file.bad() || 0 == bytes)
+      {
+         std::stringstream what;
+         what << "could only read  " << file.gcount() << " bytes from file, " << filename << "\n";
+         cb(what.str(), std::make_pair<File::RawDataType, File::RawDataSize>(nullptr,0));
+         return;
+      }
+      cb("", std::make_pair<File::RawDataType, File::RawDataSize>(std::move(data), std::move(bytes)));
+    },
+    [cb](std::exception_ptr e)
+    {
+      cb(get_exception_msg(e), std::make_pair<File::RawDataType, File::RawDataSize>(nullptr,0));
+    });
 }
 
   static void Write(const std::string& filename, const std::string& data, std::function<void(ErrorMsg)> cb)
@@ -182,6 +180,18 @@ std::string getcwd()
   return result;
 }
 
+template<typename T>
+void assertEquals(const T& first, const T& second)
+{
+  const bool equals = (first == second);
+  if(!equals)
+  {
+    std::stringstream msg;
+    msg << first << " does not equal to " << second << '\n';
+    printf("%s\n", msg.str().c_str());
+  }
+}
+
 
 int main()
 {
@@ -199,7 +209,7 @@ int main()
       cv.notify_one();
     };
 
-  auto readfile = [](const File::ErrorMsg& err, const File::RawData& data)
+  auto readfile = [&content](const File::ErrorMsg& err, const File::RawData& data)
     {
       if(!err.empty())
 	{
@@ -208,6 +218,7 @@ int main()
 	}
       printf("<read: %d bytes>\n", data.second);
       std::string out(&data.first[0], data.second);
+      assertEquals(out, content);
       printf("%s\n", out.c_str());
     };
     
