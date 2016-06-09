@@ -76,7 +76,7 @@ Or for async file io ( see testAsyncIO.cc)
 
 Prerequisite
 ============
-* tested on linux 
+* tested on linux and windows 10
 * c++ compiler wich groks c++11 - [g++, clang++ etc]
 * cmake v3.0.2+
 
