@@ -21,7 +21,7 @@
 #endif
 #include "ActiveObject.h"
 
-std::string get_exception_msg(std::exception_ptr e);
+std::string get_exception_msg(const std::exception_ptr& e);
 std::string getcwd();
 
 /**
@@ -31,7 +31,7 @@ std::string getcwd();
  */
 class ThreadPool{
 public:
-   ThreadPool(int defaultPoolsize = 4)
+   explicit ThreadPool(int defaultPoolsize = 4)
      : poolIndex_(-1),
        poolsize_(defaultPoolsize),
        pool_(poolsize_)
@@ -64,7 +64,7 @@ ThreadPool& instance()
 
 void join()
 {
-   delete instance_.release();
+   instance_ = nullptr;
 }
 
 class File{
@@ -75,7 +75,7 @@ using RawDataSize = std::streamoff;
 using RawData = std::pair<RawDataType, RawDataSize>;
 using ErrorMsg = std::string;
 
-static void Read(const std::string& filename, std::function<void(ErrorMsg, RawData)> cb)
+static void Read(const std::string& filename, const std::function<void(ErrorMsg, RawData)>& cb)
 {
    instance().nextAO().Send([filename,cb]()
    {
@@ -109,7 +109,7 @@ static void Read(const std::string& filename, std::function<void(ErrorMsg, RawDa
     });
 }
 
-  static void Write(const std::string& filename, const std::string& data, std::function<void(ErrorMsg)> cb)
+  static void Write(const std::string& filename, const std::string& data, const std::function<void(ErrorMsg)>& cb)
   {
     instance().nextAO().Send(
 			     [filename,data,cb]()
@@ -140,7 +140,7 @@ static void Read(const std::string& filename, std::function<void(ErrorMsg, RawDa
   }            
 };
 
-std::string get_exception_msg(std::exception_ptr e)
+std::string get_exception_msg(const std::exception_ptr& e)
 {
   std::string msg;
   try
@@ -162,7 +162,7 @@ std::string getcwd()
 {
   std::string result(1024,'\0');
 #ifdef _WIN32
-  while( _getcwd(&result[0], result.size()) == NULL) 
+  while( _getcwd(&result[0], result.size()) == nullptr)
 #else
     while (getcwd(&result[0], result.size()) == NULL)
 #endif

@@ -1,18 +1,17 @@
 #include <cstdlib>
 #include <functional>
 #include <cstdio>
-#include <string>
 #include <exception>
 #include <iostream>
 #include "ActiveObject.h"
 
-void dump_exception(std::exception_ptr e);
+void dump_exception(std::exception_ptr& e);
 
 class Test{
 public:
     Test()
     {}
-    void Write(const std::string& data, std::function<void(bool)> cb)
+    void Write(const std::string& data, std::function<void(bool)>&& cb)
     {
         a.Send(
             [cb](){
@@ -29,7 +28,7 @@ private:
     morpheus::ActiveObject a;
 };
 
-void dump_exception(std::exception_ptr e)
+void dump_exception(std::exception_ptr& e)
 {
     try
     {
@@ -49,10 +48,10 @@ int main()
 {
     Test t;
     t.Write("dandy", 
-            [](bool success)
+            std::move([](bool success)
             {
                 printf("Success: %i\n", success);
-            });
+            }));
     return EXIT_SUCCESS;
 }
 

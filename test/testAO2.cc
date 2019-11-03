@@ -7,8 +7,8 @@
 class Test{
 public:
     Test()
-    {}
-    void Write(const std::string& data, std::function<void(bool)> cb)
+    = default;
+    void Write(const std::string& data, const std::function<void(bool)>& cb)
     {
         a.Send(
             [cb](){
@@ -25,7 +25,7 @@ private:
 
 int main()
 {
-    Test t;
+    Test t{};
     t.Write("dandy", 
     [](bool success)
     {
